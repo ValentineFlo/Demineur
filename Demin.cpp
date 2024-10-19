@@ -1,21 +1,6 @@
 // Démin.cpp : Ce fichier contient la fonction 'main'. L'exécution du programme commence et se termine à cet endroit.
 //
 
-
-
-// Exécuter le programme : Ctrl+F5 ou menu Déboguer > Exécuter sans débogage
-// Déboguer le programme : F5 ou menu Déboguer > Démarrer le débogage
-
-// Astuces pour bien démarrer : 
-//   1. Utilisez la fenêtre Explorateur de solutions pour ajouter des fichiers et les gérer.
-//   2. Utilisez la fenêtre Team Explorer pour vous connecter au contrôle de code source.
-//   3. Utilisez la fenêtre Sortie pour voir la sortie de la génération et d'autres messages.
-//   4. Utilisez la fenêtre Liste d'erreurs pour voir les erreurs.
-//   5. Accédez à Projet > Ajouter un nouvel élément pour créer des fichiers de code, ou à Projet > Ajouter un élément existant pour ajouter des fichiers de code existants au projet.
-//   6. Pour rouvrir ce projet plus tard, accédez à Fichier > Ouvrir > Projet et sélectionnez le fichier .sln.
-
-
-
 #include <iostream>
 #include <string>
 #include <vector>
@@ -23,26 +8,39 @@
 
 
 // Fonction pour afficher la grille
-void afficherGrille(const std::vector < std::vector <char>>& grille)
+void afficherGrille(const std::vector < std::vector <char>>& grille, const std::vector<std::vector<bool>>& decouverte)
 {
-
     for (char colonne = 'A'; colonne < 'A' + static_cast<char>(grille[0].size()); ++colonne)
     {
-        std::cout << "  "<< colonne << "  "; // Affiche les colonnes
-
+        std::cout << "   "<< colonne ; // Affiche les colonnes
     }
     std::cout << std::endl;
 
     for (size_t i = 0; i < grille.size(); ++i) // Affichage des lignes
     {
         std::cout << (i + 1); 
-
         for (size_t j = 0; j < grille[i].size(); ++j)
         {
-            std::cout << " [" << grille[i][j] << "]"; //afiche les cases
+            if (decouverte[i][j])
+            {
+                std::cout << " [" << (grille[i][j] == '#' ? '*' : grille[i][j]) << "]"; // Affiche si c'est un chiffre ou un vide
+            } 
+            else 
+            {
+                std::cout << " [ ]"; // Cacher les cases
+            }
         }
         std::cout << std::endl;
     } 
+}
+
+// Fonction pour découvrir une case
+void decouvrirCase(std::vector<std::vector<bool>>& decouverte, int ligne, int colonne) 
+{
+    if (ligne >= 0 && ligne < decouverte.size() && colonne >= 0 && colonne < decouverte[0].size()) 
+    {
+        decouverte[ligne][colonne] = true;
+    }
 }
 
 // Fonction pour générer des bombes de manière aléatoire
@@ -82,15 +80,6 @@ void placerBombes(std::vector<std::vector<char>>& grille, int nbrBombes)
         }
     }    
 }
-
-// Fouction pour afficher les chiffres
-enum State
-{
-    Bombe,
-    Vide,
-    Nombre
-};
-
 
 
 
@@ -153,8 +142,25 @@ int main()
         // Initialise la grille
         std::vector<std::vector<char>> grille(lignes, std::vector<char>(colonnes, ' '));
         placerBombes(grille, nbrbombe); // Place les bombes
-        afficherGrille(grille); // Affiche la grille avec les bombes
+        std::vector<std::vector<bool>> decouverte(lignes, std::vector<bool>(colonnes, false)); // Initialise le tableau de découverte
 
+        while (true) 
+        {
+            afficherGrille(grille, decouverte ); // Affiche la grille
+
+            int ligne, colonne;
+            std::cout << "Entrez la ligne et la colonne à découvrir (ex: A1) : ";
+            std::cin >> colonne >> ligne; 
+
+            decouvrirCase(decouverte, ligne - 1, colonne - 1); // Découvre la case
+
+            //vérifications
+            if (grille[ligne - 1][colonne - 1] == '#')
+            {
+                std::cout << "BOOM! -------GAME OVER-------Vous avez découvert une bombe. Fin du jeu.\n";
+                break;
+            }
+        }
 
 
 
@@ -176,5 +182,4 @@ int main()
 
 
 
-// erreur pour une taille de colonne superieur à 26 et une ligne supérieur à 10
-
+// erreur pour une taille de colonne superieur à 26 (créer une boucle incréménte ) et une ligne supérieur à 10 (créer une boucle ou < 9 rajouter deux espaces lignes et  un espace colonne)
