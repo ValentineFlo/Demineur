@@ -28,7 +28,7 @@ void afficherGrille(const std::vector < std::vector <char>>& grille)
 
     for (char colonne = 'A'; colonne < 'A' + static_cast<char>(grille[0].size()); ++colonne)
     {
-        std::cout << "   "<< colonne << ""; // Affiche les colonnes
+        std::cout << "  "<< colonne << "  "; // Affiche les colonnes
 
     }
     std::cout << std::endl;
@@ -63,9 +63,36 @@ void placerBombes(std::vector<std::vector<char>>& grille, int nbrBombes)
         {
             grille[r][c] = '#'; 
             bombesPlacees++;
+             for (int i = -1; i <= 1; ++i)
+            {
+                for (int j = -1; j <= 1; ++j)
+                {
+                    if (r + i >= 0 && r + i < lignes && c + j >= 0 && c + j < colonnes)
+                    {
+                        if (grille[r + i][c + j] != '#') // Ignore les bombes
+                        {
+                            if (grille[r + i][c + j] == ' ')
+                                grille[r + i][c + j] = '1'; // Remplace par 1 s'il est vide
+                            else if (grille[r + i][c + j] >= '1' && grille[r + i][c + j] <= '8')
+                                grille[r + i][c + j]++; // Incrémente le chiffre
+                        }
+                    }
+                }
+            }
         }
     }    
 }
+
+// Fouction pour afficher les chiffres
+enum State
+{
+    Bombe,
+    Vide,
+    Nombre
+};
+
+
+
 
 int main()
 {
