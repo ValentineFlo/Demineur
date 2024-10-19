@@ -19,6 +19,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <ctime>
 
 
 // Fonction pour afficher la grille
@@ -41,50 +42,34 @@ void afficherGrille(const std::vector < std::vector <char>>& grille)
             std::cout << grille[i][j] << "[-]" ; //afiche les cases
         }
         std::cout << std::endl;
-    }
-
-  
+    } 
 }
-          
-void naviguer (std::vector<std::vector<char>>& grille)
+
+// Fonction pour générer des bombes de manière aléatoire
+void placerBombes(std::vector<std::vector<char>>& grille, int nbrBombes) 
 {
-    int x, y;
-    while (true)
+    srand(static_cast<unsigned>(time(0))); // Initialiser le générateur de nombres aléatoires
+    int lignes = grille.size();
+    int colonnes = grille[0].size();
+    int bombesPlacees = 0;
+
+    while (bombesPlacees < nbrBombes) 
     {
-        std::cout << "Entrez les coordonnées (ligne colonne) ou 'stop' pour arrêter : ";
-         std::cin >> x;
-         if (std::cin.fail()) 
-        { // Vérifier si l'entrée est valide
-            std::string stop;
-            std::cin.clear(); // Réinitialiser le flux d'entrée
-            std::cin >> stop;
-            if (stop == "stop") {
-                break; // Sortir de la boucle si l'utilisateur veut arrêter
-            }
+        int r = rand() % lignes;
+        int c = rand() % colonnes;
 
-            if (x < 1 || x > grille.size() || y < 1 || y > grille[0].size()) 
-            {
-                std::cout << "Coordonnées invalides, veuillez réessayer.\n";
-                continue; 
-            }
-
-        int ligne = x - 1;
-        int colonne = y - 1;
-
-        // Révéler la case
-        if (grille[ligne][colonne] == '#') 
-        { 
-            grille[ligne][colonne] = '#'; // Remplace par un '#'
+        // Vérifie si la case est déjà occupée par une bombe
+        if (grille[r][c] != '*') 
+        {
+            grille[r][c] = '*'; 
+            bombesPlacees++;
         }
-
-        }
-        afficherGrille(grille);
-    }
+    }    
 }
-
 
 int main()
 {
+    
     std::cout << "Et si on faisez un demineur ? (oui ou non)\n";
     std::string reponse;
     std::cin >> reponse;
@@ -133,15 +118,16 @@ int main()
                 return 1;
             }
            std::cout << " Il y aura : " << nbrbombe << " bombes dans le demineur, good luck!!\n";
+
+
            
     
     // Initialise la grille
-        std::vector<std::vector<char>> grille(lignes, std::vector<char>(colonnes, '#'));
+        // Initialise la grille
+        std::vector<std::vector<char>> grille(lignes, std::vector<char>(colonnes, ' '));
+        placerBombes(grille, nbrbombe); // Place les bombes
+        afficherGrille(grille); // Affiche la grille avec les bombes
 
-        afficherGrille(grille); // Affiche la grille initiale
-
-    // Lancer la navigation
-        naviguer(grille);
 
 
 
@@ -159,6 +145,7 @@ int main()
 
   
 }
+
 
 
 
