@@ -39,7 +39,7 @@ void afficherGrille(const std::vector < std::vector <char>>& grille)
 
         for (size_t j = 0; j < grille[i].size(); ++j)
         {
-            std::cout << grille[i][j] << "[-]" ; //afiche les cases
+            std::cout << " [" << grille[i][j] << "]"; //afiche les cases
         }
         std::cout << std::endl;
     } 
@@ -59,9 +59,9 @@ void placerBombes(std::vector<std::vector<char>>& grille, int nbrBombes)
         int c = rand() % colonnes;
 
         // Vérifie si la case est déjà occupée par une bombe
-        if (grille[r][c] != '*') 
+        if (grille[r][c] != '#') 
         {
-            grille[r][c] = '*'; 
+            grille[r][c] = '#'; 
             bombesPlacees++;
         }
     }    
