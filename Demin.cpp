@@ -148,18 +148,28 @@ int main()
         {
             afficherGrille(grille, decouverte ); // Affiche la grille
 
-            int ligne, colonne;
+            char col;
+            int ligne;
             std::cout << "Entrez la ligne et la colonne à découvrir (ex: A1) : ";
-            std::cin >> colonne >> ligne; 
+            std::cin >> col >> ligne;
+            int colonne = col - 'A'; //convertir lettre en index
 
-            decouvrirCase(decouverte, ligne - 1, colonne - 1); // Découvre la case
-
-            //vérifications
-            if (grille[ligne - 1][colonne - 1] == '#')
+            //vérifications coordonnés
+            if (colonne < 0 || colonne >= colonnes || ligne <= 0 || ligne > lignes) 
             {
-                std::cout << "BOOM! -------GAME OVER-------Vous avez découvert une bombe. Fin du jeu.\n";
+                std::cout << "Coordonnées invalides. Veuillez réessayer.\n";
+                continue;
+            }
+
+decouvrirCase(decouverte, ligne - 1, colonne); // Découvre la case
+
+            // Vérifications
+            if (grille[ligne - 1][colonne] == '#')
+            {
+                std::cout << "BOOM! -------GAME OVER------- Vous avez découvert une bombe. Fin du jeu.\n";
                 break;
             }
+
         }
 
 
@@ -175,11 +185,10 @@ int main()
         std::cout << "erreur\n";
     }
     return 0;
-
   
 }
 
 
-
-
+// ERREUR dans les coordonées
+// ERREUR en rentrant un coordonée dépassant la grille
 // erreur pour une taille de colonne superieur à 26 (créer une boucle incréménte ) et une ligne supérieur à 10 (créer une boucle ou < 9 rajouter deux espaces lignes et  un espace colonne)
