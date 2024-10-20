@@ -34,6 +34,13 @@ void afficherGrille(const std::vector < std::vector <char>>& grille, const std::
     } 
 }
 
+// Fonction pour effacer l'écran
+void effacerEcran() 
+{
+    system("clear"); // Pour Unix/Linux/Mac
+}
+
+
 // Fonction pour découvrir une case
 void decouvrirCase(std::vector<std::vector<bool>>& decouverte, int ligne, int colonne) 
 {
@@ -147,6 +154,8 @@ int main()
 
         while (true) 
         {
+            effacerEcran(); // Efface l'écran
+            std::cout << "Il y a " << nbrbombe << " bombes.\n";
             afficherGrille(grille, decouverte ); // Affiche la grille
             std::cout << std::endl;
             char col;
@@ -167,9 +176,11 @@ decouvrirCase(decouverte, ligne - 1, colonne); // Découvre la case
             // Vérifications
             if (grille[ligne - 1][colonne] == '#')
             {
-                afficherGrille(grille, decouverte, true);
-                std::cout << std::endl;
+                effacerEcran(); // Efface l'écran 
+                effacerEcran(); // Efface l'écran 
                 std::cout << "BOOM!!!! ------------------------------GAME OVER------------------------------\n";
+                std::cout << std::endl;
+                afficherGrille(grille, decouverte, true);// Affiche la grille
                 std::cout << std::endl;
                 break;
             }
@@ -193,7 +204,7 @@ decouvrirCase(decouverte, ligne - 1, colonne); // Découvre la case
 }
 
 
-// erreur supprimer ancien tableau après avoir rentrer une autre coordonnées
+// erreur pas de bombes alors pas de jeux
 // condition de victoire
 //quitter le jeu
 // mettre des flags
