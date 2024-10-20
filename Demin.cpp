@@ -8,7 +8,7 @@
 
 
 // Fonction pour afficher la grille
-void afficherGrille(const std::vector < std::vector <char>>& grille, const std::vector<std::vector<bool>>& decouverte)
+void afficherGrille(const std::vector < std::vector <char>>& grille, const std::vector<std::vector<bool>>& decouverte,bool gameOver = false)
 {
     for (char colonne = 'A'; colonne < 'A' + static_cast<char>(grille[0].size()); ++colonne)
     {
@@ -21,13 +21,13 @@ void afficherGrille(const std::vector < std::vector <char>>& grille, const std::
         std::cout << (i + 1); 
         for (size_t j = 0; j < grille[i].size(); ++j)
         {
-            if (decouverte[i][j])
+            if (decouverte[i][j] || gameOver)
             {
                 std::cout << " [" << (grille[i][j] == '#' ? '*' : grille[i][j]) << "]"; // Affiche si c'est un chiffre ou un vide
             } 
             else 
             {
-                std::cout << " [ ]"; // Cacher les cases
+                std::cout << " [-]"; // Cacher les cases
             }
         }
         std::cout << std::endl;
@@ -134,6 +134,7 @@ int main()
                 return 1;
             }
            std::cout << " Il y aura : " << nbrbombe << " bombes dans le demineur, good luck!!\n";
+           std::cout << std::endl;
 
 
            
@@ -147,7 +148,7 @@ int main()
         while (true) 
         {
             afficherGrille(grille, decouverte ); // Affiche la grille
-
+            std::cout << std::endl;
             char col;
             int ligne;
             std::cout << "Entrez la ligne et la colonne à découvrir (ex: A1) : ";
@@ -166,7 +167,10 @@ decouvrirCase(decouverte, ligne - 1, colonne); // Découvre la case
             // Vérifications
             if (grille[ligne - 1][colonne] == '#')
             {
-                std::cout << "BOOM! -------GAME OVER------- Vous avez découvert une bombe. Fin du jeu.\n";
+                afficherGrille(grille, decouverte, true);
+                std::cout << std::endl;
+                std::cout << "BOOM!!!! ------------------------------GAME OVER------------------------------\n";
+                std::cout << std::endl;
                 break;
             }
 
@@ -189,6 +193,9 @@ decouvrirCase(decouverte, ligne - 1, colonne); // Découvre la case
 }
 
 
-// ERREUR dans les coordonées
-// ERREUR en rentrant un coordonée dépassant la grille
+// erreur supprimer ancien tableau après avoir rentrer une autre coordonnées
+// condition de victoire
+//quitter le jeu
+// mettre des flags
+//rejouer
 // erreur pour une taille de colonne superieur à 26 (créer une boucle incréménte ) et une ligne supérieur à 10 (créer une boucle ou < 9 rajouter deux espaces lignes et  un espace colonne)
