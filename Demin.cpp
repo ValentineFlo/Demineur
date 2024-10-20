@@ -156,6 +156,13 @@ int main()
                 std::cout << "Difficulté inconnue, veuillez choisir entre 'facile', 'moyen' ou 'difficile'.\n";
                 return 1;
             }
+
+            if (nbrbombe < 1)
+            {
+                std::cout << " Erreur, la taille de la grille est trop petite" << std::endl;
+            }
+            return nbrbombe;
+
            std::cout << " Il y aura : " << nbrbombe << " bombes dans le demineur, good luck!!\n";
            std::cout << std::endl;
 
@@ -174,11 +181,20 @@ int main()
             std::cout << "Il y a " << nbrbombe << " bombes.\n";
             afficherGrille(grille, decouverte ); // Affiche la grille
             std::cout << std::endl;
+            std::cout << "\nEntrez 'Q' pour quitter à tout moment\n";
+            std::cout << std::endl;
             char col;
             int ligne;
             std::cout << "Entrez la ligne et la colonne à découvrir (ex: A1) : ";
             std::cin >> col >> ligne;
             int colonne = col - 'A'; //convertir lettre en index
+
+            // Quitter le jeu si l'utilisateur entre 'Q' ou 'q'
+            if (col == 'Q' || col == 'q') 
+            {
+                std::cout << "Vous avez quitté le jeu. À bientôt!\n";
+                break;
+            }
 
             //vérifications coordonnés
             if (colonne < 0 || colonne >= colonnes || ligne <= 0 || ligne > lignes) 
@@ -187,14 +203,14 @@ int main()
                 continue;
             }
 
-decouvrirCase(decouverte, ligne - 1, colonne); // Découvre la case
+            decouvrirCase(decouverte, ligne - 1, colonne); // Découvre la case
 
             // Vérifications
             if (grille[ligne - 1][colonne] == '#')
             {
                 effacerEcran(); // Efface l'écran 
                 effacerEcran(); // Efface l'écran 
-                std::cout << "BOOM👻!!!! ☠️☠️------------------------------GAME OVER------------------------------☠️☠️\n";
+                std::cout << "BOOM👻!!!! ☠️------------------------------GAME OVER------------------------------☠️\n";
                 std::cout << std::endl;
                 afficherGrille(grille, decouverte, true);// Affiche la grille
                 std::cout << std::endl;
@@ -205,7 +221,7 @@ decouvrirCase(decouverte, ligne - 1, colonne); // Découvre la case
             if (verifierVictoire(grille, decouverte)) 
             {
                 effacerEcran(); // Efface l'écran 
-                std::cout << "Félicitation🥳!!!! 😎😎 ------------------------------VICTOIRE------------------------------😎😎\n";
+                std::cout << "Félicitation🥳!!!! 😎 ------------------------------VICTOIRE------------------------------😎\n";
                 afficherGrille(grille, decouverte, true);
                 std::cout << std::endl;
                 break;
@@ -231,7 +247,8 @@ decouvrirCase(decouverte, ligne - 1, colonne); // Découvre la case
 
 
 // erreur pas de bombes alors pas de jeux grille trop petite pas de bombe pour 2x2 level facile moyen
-//quitter le jeu
+// erreur coordoné invalide non affiche en ca de coordonées dépassant le tableau
+//quitter le jeu bug pour quitter les coordonnés
 // mettre des flags
 //rejouer
 // erreur pour une taille de colonne superieur à 26 (créer une boucle incréménte ) et une ligne supérieur à 10 (créer une boucle ou < 9 rajouter deux espaces lignes et  un espace colonne)
