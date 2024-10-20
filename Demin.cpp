@@ -23,7 +23,7 @@ void afficherGrille(const std::vector < std::vector <char>>& grille, const std::
         {
             if (decouverte[i][j] || gameOver)
             {
-                std::cout << " [" << (grille[i][j] == '#' ? '*' : grille[i][j]) << "]"; // Affiche si c'est un chiffre ou un vide
+                std::cout << " [" << (grille[i][j] == '#' ? '#' : grille[i][j]) << "]"; // Affiche si c'est un chiffre ou un vide
             } 
             else 
             {
@@ -38,6 +38,22 @@ void afficherGrille(const std::vector < std::vector <char>>& grille, const std::
 void effacerEcran() 
 {
     system("clear"); // Pour Unix/Linux/Mac
+}
+
+bool verifierVictoire(const std::vector<std::vector<char>>& grille, const std::vector<std::vector<bool>>& decouverte) 
+{
+    for (size_t i = 0; i < grille.size(); ++i) 
+    {
+        for (size_t j = 0; j < grille[i].size(); ++j) 
+        {
+            // Si une case non-bombe n'est pas découverte, le jeu continue
+            if (grille[i][j] != '#' && !decouverte[i][j]) 
+            {
+                return false;
+            }
+        }
+    }
+    return true; // Toutes les cases non-bombes ont été découvertes
 }
 
 
@@ -178,9 +194,19 @@ decouvrirCase(decouverte, ligne - 1, colonne); // Découvre la case
             {
                 effacerEcran(); // Efface l'écran 
                 effacerEcran(); // Efface l'écran 
-                std::cout << "BOOM!!!! ------------------------------GAME OVER------------------------------\n";
+                std::cout << "BOOM👻!!!! ☠️☠️------------------------------GAME OVER------------------------------☠️☠️\n";
                 std::cout << std::endl;
                 afficherGrille(grille, decouverte, true);// Affiche la grille
+                std::cout << std::endl;
+                break;
+            }
+
+              // Vérification de victoire
+            if (verifierVictoire(grille, decouverte)) 
+            {
+                effacerEcran(); // Efface l'écran 
+                std::cout << "Félicitation🥳!!!! 😎😎 ------------------------------VICTOIRE------------------------------😎😎\n";
+                afficherGrille(grille, decouverte, true);
                 std::cout << std::endl;
                 break;
             }
@@ -204,8 +230,7 @@ decouvrirCase(decouverte, ligne - 1, colonne); // Découvre la case
 }
 
 
-// erreur pas de bombes alors pas de jeux
-// condition de victoire
+// erreur pas de bombes alors pas de jeux grille trop petite pas de bombe pour 2x2 level facile moyen
 //quitter le jeu
 // mettre des flags
 //rejouer
