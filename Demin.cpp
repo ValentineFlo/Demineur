@@ -40,6 +40,7 @@ void effacerEcran()
     system("clear"); // Pour Unix/Linux/Mac
 }
 
+// Fonction pour gérer la victoire du jeux
 bool verifierVictoire(const std::vector<std::vector<char>>& grille, const std::vector<std::vector<bool>>& decouverte) 
 {
     for (size_t i = 0; i < grille.size(); ++i) 
@@ -145,7 +146,7 @@ int main()
             }
             else if (diff == "moyen")
             {
-                nbrbombe = (static_cast <int> (colonnes * lignes)) * 0.2;
+                nbrbombe = static_cast <int> ((colonnes * lignes) * 0.2);
             }
             else if (diff == "difficile")
             {
@@ -157,11 +158,16 @@ int main()
                 return 1;
             }
 
-            if (nbrbombe < 1)
+
+            while  (nbrbombe < 1)
             {
-                std::cout << " Erreur, la taille de la grille est trop petite" << std::endl;
+            {
+                std::cout << std::endl;
+                std::cout << " !!!🚨Erreur, la taille de la grille est trop petite!!!" << std::endl;
             }
-            return nbrbombe;
+            continue;
+            }
+            
 
            std::cout << " Il y aura : " << nbrbombe << " bombes dans le demineur, good luck!!\n";
            std::cout << std::endl;
@@ -170,7 +176,6 @@ int main()
            
     
     // Initialise la grille
-        // Initialise la grille
         std::vector<std::vector<char>> grille(lignes, std::vector<char>(colonnes, ' '));
         placerBombes(grille, nbrbombe); // Place les bombes
         std::vector<std::vector<bool>> decouverte(lignes, std::vector<bool>(colonnes, false)); // Initialise le tableau de découverte
@@ -178,7 +183,7 @@ int main()
         while (true) 
         {
             effacerEcran(); // Efface l'écran
-            std::cout << "Il y a " << nbrbombe << " bombes.\n";
+            std::cout << "Il y a " << nbrbombe << " bombes\n";
             afficherGrille(grille, decouverte ); // Affiche la grille
             std::cout << std::endl;
             std::cout << "\nEntrez 'Q' pour quitter à tout moment\n";
@@ -192,7 +197,7 @@ int main()
             // Quitter le jeu si l'utilisateur entre 'Q' ou 'q'
             if (col == 'Q' || col == 'q') 
             {
-                std::cout << "Vous avez quitté le jeu. À bientôt!\n";
+                std::cout << "Vous avez quitté le jeu. À bientôt👋!\n";
                 break;
             }
 
@@ -203,7 +208,8 @@ int main()
                 continue;
             }
 
-            decouvrirCase(decouverte, ligne - 1, colonne); // Découvre la case
+            // Découvre la case
+            decouvrirCase(decouverte, ligne - 1, colonne); 
 
             // Vérifications
             if (grille[ligne - 1][colonne] == '#')
