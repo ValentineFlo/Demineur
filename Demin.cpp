@@ -74,11 +74,15 @@ bool verifierVictoire(const std::vector<std::vector<char>>&grille, const std::ve
 
 
 // Fonction pour découvrir une case
-void decouvrirCase(std::vector<std::vector<bool>>&decouverte, int ligne, int colonne)
+void decouvrirCase(std::vector<std::vector<bool>>&decouverte, std::vector<std::vector<bool>>& drapeaux, int ligne, int colonne)
 {
+    if (!drapeaux[ligne][colonne]) 
+    {
+
     if (ligne >= 0 && ligne < decouverte.size() && colonne >= 0 && colonne < decouverte[0].size())
     {
         decouverte[ligne][colonne] = true;
+    }
     }
 }
 
@@ -195,11 +199,11 @@ int main()
             std::cout << "Il y a " << nbrbombe << " bombes\n";
             afficherGrille(grille, decouverte, drapeaux); // Affiche la grille
             std::cout << std::endl;
-            std::cout << " Entrez 'stop' pour quitter le jeu :\n" << "Entrez 'dig' pour decouvrir une case\n" << "Entrez 'flag' pour placer un drapeau\n" << "Entrez 'restart' pour rejouer\n";
+            std::cout << " 'quitter'\n" << "'dig'\n" << "'flag'\n" << "'restart' \n";
             std::string Choix;
             std::cout << "Entrez votre choix : ";
             std::cin >> Choix;
-            if (Choix == "stop")
+            if (Choix == "quitter")
             {
                 effacerEcran();
                 std::cout << "Vous avez quitte le jeu. A bientot!\n";
@@ -208,6 +212,7 @@ int main()
             else if (Choix == "restart")
             {
                 effacerEcran();
+                break;
 
             }
             else if (Choix == "dig" || Choix == "flag")
@@ -220,33 +225,35 @@ int main()
                 effacerEcran();
             
 
-                if (colonne < 0 || colonne >= colonnes || ligne <= 0 || ligne > lignes) //vérifications coordonnés
+            if (colonne < 0 || colonne >= colonnes || ligne <= 0 || ligne > lignes) //vérifications coordonnés
+            {
+                std::cout << "Coordonnees invalides. Veuillez reessayer.\n";
+                continue;
+            }
+        
+                if (Choix == "dig")
                 {
-                    std::cout << "Coordonnees invalides. Veuillez reessayer.\n";
-                    continue;
-                }
-                else 
-                {
-                    if (Choix == "dig")
+                    if (!drapeaux[ligne - 1][colonne])
                     {
-                        decouvrirCase(decouverte, ligne - 1, colonne);
-                    }
-                    else
-                    {
-                        placerDrapeau(drapeaux, ligne - 1, colonne);
+                        decouvrirCase(decouverte, drapeaux, ligne - 1, colonne);
+                        if (grille[ligne - 1][colonne] == '#')
+                        {
+                            effacerEcran(); 
+                            std::cout << "BOOM!!!!------------------------------GAME OVER------------------------------\n";
+                            std::cout << std::endl;
+                            afficherGrille(grille, decouverte, drapeaux, true);
+                            std::cout << std::endl;
+                            break;
+                        }
                     }
                 }
-                // Défaite
-                if (grille[ligne - 1][colonne] == '#')
+                if (Choix == "flag")
                 {
-                    effacerEcran(); 
-                    std::cout << "BOOM!!!!------------------------------GAME OVER------------------------------\n";
-                    std::cout << std::endl;
-                    afficherGrille(grille, decouverte, drapeaux, true);
-                    std::cout << std::endl;
-                    break;
+                    placerDrapeau(drapeaux, ligne - 1, colonne);
                 }
-
+            }
+            
+            
                 // Victoire
                 if (verifierVictoire(grille, decouverte))
                 {
@@ -256,7 +263,6 @@ int main()
                     std::cout << std::endl;
                     break;
                 }
-            }
 
         }
 
@@ -275,8 +281,7 @@ int main()
 }
 
 
-//erreur flag suprimme si on dig
-//erreur flag si click su bombe
+//erreur flag si click sur bombe
 // restart
 // erreur pour une taille de colonne superieur à 26 (créer une boucle incréménte ) et une ligne supérieur à 10 (créer une boucle ou < 9 rajouter deux espaces lignes et  un espace colonne)
 // erreur coordoné invalide non affiche en ca de coordonées dépassant le tableau
