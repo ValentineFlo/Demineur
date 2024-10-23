@@ -9,13 +9,13 @@
 
 
 // Fonction pour afficher la grille
-void afficherGrille(const std::vector < std::vector <char>>&grille, const std::vector<std::vector<bool>>&decouverte, bool gameOver = false)
+void afficherGrille(const std::vector < std::vector <char>>&grille, const std::vector<std::vector<bool>>&decouverte, const std::vector<std::vector<bool>>& drapeaux, bool gameOver = false)
 {
     for (char colonne = 'A'; colonne < 'A' + static_cast<char>(grille[0].size()); ++colonne)
     {
         std::cout << "   " << colonne;
     }
-    std::cout << std::endl;
+    std::cout << std::endl; 
 
     for (size_t i = 0; i < grille.size(); ++i)
     {
@@ -25,6 +25,10 @@ void afficherGrille(const std::vector < std::vector <char>>&grille, const std::v
             if (decouverte[i][j] || gameOver)
             {
                 std::cout << " [" << (grille[i][j] == '#' ? '#' : grille[i][j]) << "]"; 
+            }
+            else if (drapeaux[i][j])
+            {
+                std::cout << " [!]";
             }
             else
             {
@@ -40,6 +44,15 @@ void effacerEcran()
 {
     system("clear");//sous UNIX
     system("cls"); //sous windows
+}
+
+// Fonction pour les drapeaux
+void placerDrapeau(std::vector<std::vector<bool>>& drapeaux, int ligne, int colonne)
+{
+    if (ligne >= 0 && ligne < drapeaux.size() && colonne >= 0 && colonne < drapeaux[0].size())
+    {
+        drapeaux[ligne][colonne] = !drapeaux[ligne][colonne]; // Bascule le drapeau
+    }
 }
 
 // Fonction pour gérer la victoire du jeux
@@ -132,6 +145,7 @@ int main()
         std::cin >> lignes;
         std::cout << "Quelle est la taille des colonnes ? : ";
         std::cin >> colonnes;
+        std::vector<std::vector<bool>> drapeaux(lignes, std::vector<bool>(colonnes, false));
 
         //Générer la difficulté
         std::cout << " Quel est la difficulte ? | facile | moyen | difficile | : ";
@@ -158,7 +172,7 @@ int main()
             return 1;
         }
 
-
+        // afficher une bombe même pour les niveaux de difficultés bas et petite grille
         if (nbrbombe < 1)
         {
             nbrbombe = 1;
@@ -168,18 +182,18 @@ int main()
         std::cout << std::endl;
 
 
-
-
-        // Initialise la grille
+        // Initialise toutes les grilles, découverte et drapeaux
         std::vector<std::vector<char>> grille(lignes, std::vector<char>(colonnes, ' '));
-        placerBombes(grille, nbrbombe);
         std::vector<std::vector<bool>> decouverte(lignes, std::vector<bool>(colonnes, false));
+       
+        placerBombes(grille, nbrbombe);
+        
 
         while (true)
         {
             effacerEcran(); // Efface l'écran
             std::cout << "Il y a " << nbrbombe << " bombes\n";
-            afficherGrille(grille, decouverte); // Affiche la grille
+            afficherGrille(grille, decouverte, drapeaux); // Affiche la grille
             std::cout << std::endl;
             std::cout << " Entrez 'stop' pour quitter le jeu :\n" << "Entrez 'dig' pour decouvrir une case\n" << "Entrez 'flag' pour placer un drapeau\n" << "Entrez 'restart' pour rejouer\n";
             std::string Choix;
@@ -204,21 +218,22 @@ int main()
                 std::cin >> col >> ligne;
                 int colonne = col - 'A';
                 effacerEcran();
+            
 
                 if (colonne < 0 || colonne >= colonnes || ligne <= 0 || ligne > lignes) //vérifications coordonnés
                 {
                     std::cout << "Coordonnees invalides. Veuillez reessayer.\n";
                     continue;
                 }
-                else // Découvre la case
+                else 
                 {
                     if (Choix == "dig")
                     {
                         decouvrirCase(decouverte, ligne - 1, colonne);
                     }
-                    else (Choix == "flag");
+                    else
                     {
-                        
+                        placerDrapeau(drapeaux, ligne - 1, colonne);
                     }
                 }
                 // Défaite
@@ -227,7 +242,7 @@ int main()
                     effacerEcran(); 
                     std::cout << "BOOM!!!!------------------------------GAME OVER------------------------------\n";
                     std::cout << std::endl;
-                    afficherGrille(grille, decouverte, true);
+                    afficherGrille(grille, decouverte, drapeaux, true);
                     std::cout << std::endl;
                     break;
                 }
@@ -237,12 +252,11 @@ int main()
                 {
                     effacerEcran();
                     std::cout << "Felicitation!!!!------------------------------VICTOIRE------------------------------\n";
-                    afficherGrille(grille, decouverte, true);
+                    afficherGrille(grille, decouverte, drapeaux, true);
                     std::cout << std::endl;
                     break;
                 }
             }
-
 
         }
 
@@ -261,7 +275,8 @@ int main()
 }
 
 
-// erreur coordoné invalide non affiche en ca de coordonées dépassant le tableau
-// mettre des flags
+//erreur flag suprimme si on dig
+//erreur flag si click su bombe
 // restart
 // erreur pour une taille de colonne superieur à 26 (créer une boucle incréménte ) et une ligne supérieur à 10 (créer une boucle ou < 9 rajouter deux espaces lignes et  un espace colonne)
+// erreur coordoné invalide non affiche en ca de coordonées dépassant le tableau
