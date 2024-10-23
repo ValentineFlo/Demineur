@@ -42,9 +42,13 @@ void afficherGrille(const std::vector < std::vector <char>>&grille, const std::v
 // Fonction pour effacer l'écran
 void effacerEcran()
 {
-    system("clear");//sous UNIX
-    system("cls"); //sous windows
+    #ifdef _WIN32
+    system("cls");
+    #else
+    system("clear");
+    #endif
 }
+
 
 // Fonction pour les drapeaux
 void placerDrapeau(std::vector<std::vector<bool>>& drapeaux, int ligne, int colonne)
@@ -124,25 +128,11 @@ void placerBombes(std::vector<std::vector<char>>&grille, int nbrBombes)
     }
 }
 
-
-
-int main()
+void jouerDemineur()
 {
-
-    std::cout << "Et si on faisez un demineur ? (oui ou non)\n";
-    std::string reponse;
-    std::cin >> reponse;
-    std::string grille;
+    
     std::string diff;
-
-
-    // Lancement du démineur 
-    if (reponse == "oui")
-    {
-        std::cout << " C'est partit, bon jeux!! \n";
-        std::cout << std::endl;
-        std::cout << grille;
-        int lignes, colonnes;
+    int lignes, colonnes;
 
         //Demander à l'utilisateur la taille de la grille
         std::cout << "Quelle est la taille des lignes ? : ";
@@ -150,30 +140,36 @@ int main()
         std::cout << "Quelle est la taille des colonnes ? : ";
         std::cin >> colonnes;
         std::vector<std::vector<bool>> drapeaux(lignes, std::vector<bool>(colonnes, false));
+        
+        if (lignes <= 0 || colonnes <= 0) 
+        {
+        std::cout << "Les dimensions de la grille doivent être positives.\n";
+        return;
+        }
+
 
         //Générer la difficulté
-        std::cout << " Quel est la difficulte ? | facile | moyen | difficile | : ";
-
+        std::cout << " Quel est la difficulte ? | easy | medium | hard | : ";
         std::cin >> diff;
         int nbrbombe = 0;
 
 
-        if (diff == "facile")
+        if (diff == "easy")
         {
             nbrbombe = static_cast <int> ((colonnes * lignes) * 0.1);
         }
-        else if (diff == "moyen")
+        else if (diff == "medium")
         {
             nbrbombe = static_cast <int> ((colonnes * lignes) * 0.2);
         }
-        else if (diff == "difficile")
+        else if (diff == "hard")
         {
             nbrbombe = static_cast <int> ((colonnes * lignes) * 0.3);
         }
         else
         {
             std::cout << "Difficulte inconnue, veuillez choisir entre 'facile', 'moyen' ou 'difficile'.\n";
-            return 1;
+            return;
         }
 
         // afficher une bombe même pour les niveaux de difficultés bas et petite grille
@@ -199,20 +195,35 @@ int main()
             std::cout << "Il y a " << nbrbombe << " bombes\n";
             afficherGrille(grille, decouverte, drapeaux); // Affiche la grille
             std::cout << std::endl;
-            std::cout << " 'quitter'\n" << "'dig'\n" << "'flag'\n" << "'restart' \n";
+            std::cout << " 'dig'\n" << "'flag'\n" << "'restart'\n" << "'exit' \n";
             std::string Choix;
             std::cout << "Entrez votre choix : ";
             std::cin >> Choix;
-            if (Choix == "quitter")
+
+            if (Choix == "exit")
             {
                 effacerEcran();
                 std::cout << "Vous avez quitte le jeu. A bientot!\n";
                 break;
+                
             }
             else if (Choix == "restart")
             {
                 effacerEcran();
-                break;
+                std::cout << "Redémarrage du jeu...\n";
+                while (true)
+                {
+                    jouerDemineur();
+                    std::cout << "Souhaitez-vous jouer à nouveau ? (oui ou non) : ";
+                    std::string restart;
+                    std::cin >> restart;
+                    if (restart != "oui") 
+                    {
+                        std::cout << "À plus tard ;) !!\n";
+                        break;
+                    }
+                }
+                return;
 
             }
             else if (Choix == "dig" || Choix == "flag")
@@ -268,6 +279,23 @@ int main()
 
     }
 
+
+
+
+int main()
+{
+    std::cout << "Et si on faisez un demineur ? (oui ou non)\n";
+    std::string reponse;
+    std::cin >> reponse;
+// Lancement du démineur 
+    if (reponse == "oui")
+    {
+        std::cout << "C'est parti, bon jeu !!\n";
+        std::cout << std::endl;
+        jouerDemineur();
+
+    }
+
     else if (reponse == "non")
     {
         std::cout << " A plus tard ;) !! \n";
@@ -280,8 +308,4 @@ int main()
 
 }
 
-
-//erreur flag si click sur bombe
-// restart
 // erreur pour une taille de colonne superieur à 26 (créer une boucle incréménte ) et une ligne supérieur à 10 (créer une boucle ou < 9 rajouter deux espaces lignes et  un espace colonne)
-// erreur coordoné invalide non affiche en ca de coordonées dépassant le tableau
