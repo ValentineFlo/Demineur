@@ -8,12 +8,31 @@
 #include <ctime>
 
 
+// Fonction pour générer un nom de colonne (A, B, ..., Z, AA, AB, ..., AZ, BA, etc.)
+std::string nomColonne(int index) {
+    std::string nom;
+    while (index >= 0) {
+        nom = char('A' + (index % 26)) + nom;
+        index = index / 26 - 1;
+    }
+    return nom;
+}
 // Fonction pour afficher la grille
 void afficherGrille(const std::vector < std::vector <char>>&grille, const std::vector<std::vector<bool>>&decouverte, const std::vector<std::vector<bool>>& drapeaux, bool gameOver = false)
 {
-    for (char colonne = 'A'; colonne < 'A' + static_cast<char>(grille[0].size()); ++colonne)
+     for (int col = 0; col < grille[0].size(); ++col)
     {
-        std::cout << "   " << colonne;
+        std::string nom = nomColonne(col);
+        
+        // espace 1 lettre
+        if (nom.length() == 1) 
+        {
+            std::cout << "   " << nom; 
+        }
+        else // espace 2 lettres
+        {
+            std::cout << "  " << nom;
+        }
     }
     std::cout << std::endl; 
 
@@ -38,6 +57,7 @@ void afficherGrille(const std::vector < std::vector <char>>&grille, const std::v
         std::cout << std::endl;
     }
 }
+
 
 // Fonction pour effacer l'écran
 void effacerEcran()
@@ -76,19 +96,35 @@ bool verifierVictoire(const std::vector<std::vector<char>>&grille, const std::ve
     return true; // Toutes les cases non-bombes ont été découvertes
 }
 
+// Declaration floodFill
+void floodFill(const std::vector<std::vector<char>>& grille, std::vector<std::vector<bool>>& decouverte, int ligne, int colonne);
 
 // Fonction pour découvrir une case
-void decouvrirCase(std::vector<std::vector<bool>>&decouverte, std::vector<std::vector<bool>>& drapeaux, int ligne, int colonne)
+void decouvrirCase(
+    std::vector<std::vector<bool>>&decouverte, 
+    std::vector<std::vector<bool>>& drapeaux, 
+    int ligne, int colonne, 
+    const std::vector<std::vector<char>>& grille)
 {
-    if (!drapeaux[ligne][colonne]) 
-    {
+
 
     if (ligne >= 0 && ligne < decouverte.size() && colonne >= 0 && colonne < decouverte[0].size())
     {
+        if (grille[ligne][colonne] == '#' || drapeaux[ligne][colonne])
+        {
+            return;
+        }
+
         decouverte[ligne][colonne] = true;
-    }
+
+        if (grille[ligne][colonne] == ' ')
+        {
+            floodFill(grille, decouverte, ligne, colonne);
+        }
+
     }
 }
+
 
 // Fonction pour générer des bombes de manière aléatoire
 void placerBombes(std::vector<std::vector<char>>&grille, int nbrBombes)
@@ -126,6 +162,33 @@ void placerBombes(std::vector<std::vector<char>>&grille, int nbrBombes)
             }
         }
     }
+}
+
+void floodFill (const std::vector<std::vector<char>>& grille, std::vector<std::vector<bool>>& decouverte, int ligne, int colonne)
+{
+    if (ligne < 0 || ligne >= grille.size() || colonne < 0 || colonne >= grille[0].size() || decouverte[ligne][colonne])
+    {
+        return;
+    }
+    
+    decouverte[ligne][colonne] = true;
+
+    if (grille[ligne][colonne] != ' ')
+    {
+        return;
+    }
+
+        // 8 cases adjacentes
+        floodFill(grille, decouverte, ligne - 1, colonne);     // Haut
+        floodFill(grille, decouverte, ligne + 1, colonne);     // Bas
+        floodFill(grille, decouverte, ligne, colonne - 1);     // Gauche
+        floodFill(grille, decouverte, ligne, colonne + 1);     // Droite
+        floodFill(grille, decouverte, ligne - 1, colonne - 1); // Haut-Gauche
+        floodFill(grille, decouverte, ligne - 1, colonne + 1); // Haut-Droite
+        floodFill(grille, decouverte, ligne + 1, colonne - 1); // Bas-Gauche
+        floodFill(grille, decouverte, ligne + 1, colonne + 1); // Bas-Droite
+    
+    
 }
 
 void jouerDemineur()
@@ -233,6 +296,7 @@ void jouerDemineur()
                 std::cout << "Entrez la ligne et la colonne a decouvrir (ex: A1) : ";
                 std::cin >> col >> ligne;
                 int colonne = col - 'A';
+                ligne-1;
                 effacerEcran();
             
 
@@ -246,11 +310,11 @@ void jouerDemineur()
                 {
                     if (!drapeaux[ligne - 1][colonne])
                     {
-                        decouvrirCase(decouverte, drapeaux, ligne - 1, colonne);
+                        decouvrirCase(decouverte, drapeaux, ligne - 1, colonne, grille);
                         if (grille[ligne - 1][colonne] == '#')
                         {
                             effacerEcran(); 
-                            std::cout << "BOOM!!!!------------------------------GAME OVER------------------------------\n";
+                            std::cout << "BOOM!!!!------------------------------GAME OVER------------------------------!!!!\n";
                             std::cout << std::endl;
                             afficherGrille(grille, decouverte, drapeaux, true);
                             std::cout << std::endl;
@@ -269,7 +333,7 @@ void jouerDemineur()
                 if (verifierVictoire(grille, decouverte))
                 {
                     effacerEcran();
-                    std::cout << "Felicitation!!!!------------------------------VICTOIRE------------------------------\n";
+                    std::cout << "Felicitation!!!!------------------------------VICTOIRE------------------------------!!!!\n";
                     afficherGrille(grille, decouverte, drapeaux, true);
                     std::cout << std::endl;
                     break;
@@ -278,8 +342,6 @@ void jouerDemineur()
         }
 
     }
-
-
 
 
 int main()
