@@ -36,22 +36,29 @@ void afficherGrille(const std::vector < std::vector <char>>&grille, const std::v
     }
     std::cout << std::endl; 
 
-    for (size_t i = 0; i < grille.size(); ++i)
-    {
-        std::cout << (i + 1);
-        for (size_t j = 0; j < grille[i].size(); ++j)
+   for (size_t i = 0; i < grille.size(); ++i) 
+   {
+        if (i + 1 < 10) 
         {
-            if (decouverte[i][j] || gameOver)
+            std::cout << " " << (i + 1);
+        } 
+        else 
+        {
+            std::cout << (i + 1);
+        }
+        for (size_t j = 0; j < grille[i].size(); ++j) 
+        {
+            if (decouverte[i][j] || gameOver) 
             {
-                std::cout << " [" << (grille[i][j] == '#' ? '#' : grille[i][j]) << "]"; 
-            }
-            else if (drapeaux[i][j])
+                std::cout << " [" << (grille[i][j] == '#' ? '#' : grille[i][j]) << "]";
+            } 
+            else if (drapeaux[i][j]) 
             {
                 std::cout << " [!]";
-            }
-            else
+            } 
+            else 
             {
-                std::cout << " [-]"; // Cacher les cases
+                std::cout << " [-]";
             }
         }
         std::cout << std::endl;
@@ -96,8 +103,30 @@ bool verifierVictoire(const std::vector<std::vector<char>>&grille, const std::ve
     return true; // Toutes les cases non-bombes ont été découvertes
 }
 
-// Declaration floodFill
-void floodFill(const std::vector<std::vector<char>>& grille, std::vector<std::vector<bool>>& decouverte, int ligne, int colonne);
+void floodFill (const std::vector<std::vector<char>>& grille, std::vector<std::vector<bool>>& decouverte, int ligne, int colonne)
+{
+    if (ligne < 0 || ligne >= grille.size() || colonne < 0 || colonne >= grille[0].size() || decouverte[ligne][colonne])
+    {
+        return;
+    }
+
+    decouverte[ligne][colonne] = true;
+
+    if (grille[ligne][colonne] == ' ') 
+    {
+        floodFill(grille, decouverte, ligne - 1, colonne);     // Haut
+        floodFill(grille, decouverte, ligne + 1, colonne);     // Bas
+        floodFill(grille, decouverte, ligne, colonne - 1);     // Gauche
+        floodFill(grille, decouverte, ligne, colonne + 1);     // Droite
+        floodFill(grille, decouverte, ligne - 1, colonne - 1); // Haut-Gauche
+        floodFill(grille, decouverte, ligne - 1, colonne + 1); // Haut-Droite
+        floodFill(grille, decouverte, ligne + 1, colonne - 1); // Bas-Gauche
+        floodFill(grille, decouverte, ligne + 1, colonne + 1); // Bas-Droite 
+        
+    }
+      
+}
+
 
 // Fonction pour découvrir une case
 void decouvrirCase(
@@ -107,19 +136,18 @@ void decouvrirCase(
     const std::vector<std::vector<char>>& grille)
 {
 
-
     if (ligne >= 0 && ligne < decouverte.size() && colonne >= 0 && colonne < decouverte[0].size())
     {
-        if (grille[ligne][colonne] == '#' || drapeaux[ligne][colonne])
+        if (drapeaux[ligne][colonne] || decouverte[ligne][colonne])
         {
             return;
         }
 
-        decouverte[ligne][colonne] = true;
+        floodFill(grille, decouverte, ligne, colonne);
 
-        if (grille[ligne][colonne] == ' ')
+        if (grille[ligne][colonne] == '#') 
         {
-            floodFill(grille, decouverte, ligne, colonne);
+            return;
         }
 
     }
@@ -151,44 +179,23 @@ void placerBombes(std::vector<std::vector<char>>&grille, int nbrBombes)
                     if (r + i >= 0 && r + i < lignes && c + j >= 0 && c + j < colonnes)
                     {
                         if (grille[r + i][c + j] != '#') 
+                        {   
+                        
+                        if (grille[r + i][c + j] == ' ') 
                         {
-                            if (grille[r + i][c + j] == ' ')
-                                grille[r + i][c + j] = '1';
-                            else if (grille[r + i][c + j] >= '1' && grille[r + i][c + j] <= '8')
-                                grille[r + i][c + j]++;
+                            grille[r + i][c + j] = '1'; 
+                        }
+
+                        else if (grille[r + i][c + j] >= '1' && grille[r + i][c + j] < '8') 
+                        {
+                            grille[r + i][c + j]++; 
+                        }
                         }
                     }
                 }
             }
         }
     }
-}
-
-void floodFill (const std::vector<std::vector<char>>& grille, std::vector<std::vector<bool>>& decouverte, int ligne, int colonne)
-{
-    if (ligne < 0 || ligne >= grille.size() || colonne < 0 || colonne >= grille[0].size() || decouverte[ligne][colonne])
-    {
-        return;
-    }
-    
-    decouverte[ligne][colonne] = true;
-
-    if (grille[ligne][colonne] != ' ')
-    {
-        return;
-    }
-
-        // 8 cases adjacentes
-        floodFill(grille, decouverte, ligne - 1, colonne);     // Haut
-        floodFill(grille, decouverte, ligne + 1, colonne);     // Bas
-        floodFill(grille, decouverte, ligne, colonne - 1);     // Gauche
-        floodFill(grille, decouverte, ligne, colonne + 1);     // Droite
-        floodFill(grille, decouverte, ligne - 1, colonne - 1); // Haut-Gauche
-        floodFill(grille, decouverte, ligne - 1, colonne + 1); // Haut-Droite
-        floodFill(grille, decouverte, ligne + 1, colonne - 1); // Bas-Gauche
-        floodFill(grille, decouverte, ligne + 1, colonne + 1); // Bas-Droite
-    
-    
 }
 
 void jouerDemineur()
@@ -296,7 +303,7 @@ void jouerDemineur()
                 std::cout << "Entrez la ligne et la colonne a decouvrir (ex: A1) : ";
                 std::cin >> col >> ligne;
                 int colonne = col - 'A';
-                ligne-1;
+                ligne - 1;
                 effacerEcran();
             
 
@@ -370,4 +377,3 @@ int main()
 
 }
 
-// erreur pour une taille de colonne superieur à 26 (créer une boucle incréménte ) et une ligne supérieur à 10 (créer une boucle ou < 9 rajouter deux espaces lignes et  un espace colonne)
